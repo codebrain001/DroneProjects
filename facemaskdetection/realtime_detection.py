@@ -12,10 +12,8 @@ import imutils
 import time
 import cv2
 import os
-from djitellopy import Tello
 import time
-
-from drone import Drone
+# import drone_config
 
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
@@ -44,6 +42,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
         # filter out weak detections by ensuring the confidence is
         # greater than the minimum confidence
         if confidence > args["confidence"]:
+            print('&&&&&&&&', args["confidence"])
             # compute the (x, y)-coordinates of the bounding box for
             # the object
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
@@ -94,33 +93,39 @@ args = vars(ap.parse_args())
 
 # load our serialized face detector model from disk
 print("[INFO] loading face detector model...")
-prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
-weightsPath = os.path.sep.join([args["face"],
-                                "res10_300x300_ssd_iter_140000.caffemodel"])
+# prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
+prototxtPath = (
+    '/Users/USER/Documents/DroneProjects/facemaskdetection/face_detector/deploy.prototxt')
+# weightsPath = os.path.sep.join([args["face"],
+#                                 "res10_300x300_ssd_iter_140000.caffemodel"])
+weightsPath = (
+    '/Users/USER/Documents/DroneProjects/facemaskdetection/face_detector/res10_300x300_ssd_iter_140000.caffemodel')
 faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
 
 # load the face mask detector model from disk
 print("[INFO] loading face mask detector model...")
-maskNet = load_model(args["model"])
+maskNet = load_model(
+    '/Users/USER/Documents/DroneProjects/facemaskdetection/mask_detector.model')
 
 
-drone_test = Drone(0, 0, 0, 0, 0)
-drone_test.status()
-drone_test.camera_stream()
+# drone_test = Drone(0, 640, 480, 0, 0, 0, 0, 0)
+# drone_test.status()
+# drone_test.camera_stream()
 # frame = drone_test.get_frame()
 
 
 # # initialize the video stream and allow the camera sensor to warm up
 # print("[INFO] starting video stream...")
-# vs = VideoStream(src=0).start()
-# time.sleep(2.0)
+vs = VideoStream(src=0).start()
+time.sleep(2.0)
 
 # loop over the frames from the video stream
 while True:
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 400 pixels
-    frame = drone_test.get_frame()
-    #frame = imutils.resize(frame, width=400)
+    frame = vs.read()
+    #frame = drone_test.get_frame()
+    frame = imutils.resize(frame, width=400)
 
     # detect faces in the frame and determine if they are wearing a
     # face mask or not
@@ -164,6 +169,6 @@ while True:
     if key == ord("q"):
         break
 
-# # do a bit of cleanup
-# cv2.destroyAllWindows()
-# vs.stop()
+# do a bit of cleanup
+cv2.destroyAllWindows()
+vs.stop()

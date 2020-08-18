@@ -65,23 +65,23 @@ class Drone:
         frame_read = pkg.get_frame_read()
         return frame_read.frame
 
-    def get_video(self):
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter('drone_video.avi', fourcc, 20.0, (640, 480))
-        frame_read = pkg.get_frame_read()
-        while(True):
-            cv2.imshow('Video Stream', frame_read.frame)
-            out.write(frame_read.frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+    # def get_video(self):
+    #     fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    #     out = cv2.VideoWriter('drone_video.avi', fourcc, 20.0, (640, 480))
+    #     frame_read = pkg.get_frame_read()
+    #     while(True):
+    #         cv2.imshow('Video Stream', frame_read.frame)
+    #         out.write(frame_read.frame)
+    #         if cv2.waitKey(1) & 0xFF == ord('q'):
+    #             break
 
-        cap.release()
-        out.release()
-        cv2.destroyAllWindows()
+    #     cap.release()
+    #     out.release()
+    #     cv2.destroyAllWindows()
 
-        return 'complete'
+    #     return 'complete'
 
-    # ?def get_snap_shots(self, get_frame):
+    # def get_snap_shots(self, get_frame):
     #     frame = get_frame()
     #     count = 0
     #     if facemask_detection.label.split(':')[0] == 'No Mask':
@@ -105,9 +105,11 @@ class Drone:
         # pkg.end()
         pass
 
-
-drone_test = Drone(0, 640, 480, 0, 0, 0, 0, 0)
-drone_test.get_status()
-drone_test.get_stream()
-drone_test.get_video()
-# drone_test.get_movement()
+    def get_snap_shots(self, label, frame):
+        count = 0
+        if label.split(':')[0] == 'No Mask':
+            file_name = './snapshots/no mask ' + str(count) + '.jpg'
+            print(file_name)
+            cv2.imwrite(file_name, frame)
+            count += 1
+            time.sleep(2)
